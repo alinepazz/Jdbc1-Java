@@ -2,11 +2,7 @@ package application;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import db.DB;
 
@@ -14,7 +10,7 @@ public class Program {
 
 	public static void main(String[] args) {
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	//	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Connection conn = null;
 	//	Statement st = null;
     //  ResultSet rs = null;
@@ -40,7 +36,7 @@ public class Program {
 		}*/
 		
 
-		try {
+		/* try {
 			conn = DB.getConnection();
 			
 			//EXAMPLO 1
@@ -82,6 +78,30 @@ public class Program {
 		}catch(ParseException e) {
 			e.printStackTrace();
 		}
+		finally {
+			DB.closeConnection();
+			DB.closeStatement(ps);
+		} */
+		
+		try {
+			
+			conn = DB.getConnection();
+			ps = conn.prepareStatement("UPDATE seller "
+				+ "SET BaseSalary = BaseSalary + ? "
+				+ "WHERE "
+				+ "(DepartmentId = ?)");
+			
+			ps.setDouble(1, 500.00);
+			ps.setInt(2, 4);
+			
+			int linhasAfetadas = ps.executeUpdate();
+			System.out.println("Done! rows affected: " + linhasAfetadas);
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
 		finally {
 			DB.closeConnection();
 			DB.closeStatement(ps);
