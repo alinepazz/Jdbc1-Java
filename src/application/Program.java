@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import db.DB;
+import db.DbIntegrityConstraintViolationException;
 
 public class Program {
 
@@ -86,20 +87,26 @@ public class Program {
 		try {
 			
 			conn = DB.getConnection();
-			ps = conn.prepareStatement("UPDATE seller "
+			/*ps = conn.prepareStatement("UPDATE seller "
 				+ "SET BaseSalary = BaseSalary + ? "
 				+ "WHERE "
 				+ "(DepartmentId = ?)");
 			
 			ps.setDouble(1, 500.00);
-			ps.setInt(2, 4);
+			ps.setInt(2, 4); */
+			
+			ps = conn.prepareStatement("DELETE FROM department "
+					+ "WHERE "
+					+ "Id = ?");
+			
+			ps.setInt(1, 4);
 			
 			int linhasAfetadas = ps.executeUpdate();
 			System.out.println("Done! rows affected: " + linhasAfetadas);
 			
 			
 		}catch(SQLException e) {
-			e.printStackTrace();
+			throw new DbIntegrityConstraintViolationException(e.getMessage());
 		}
 		
 		finally {
