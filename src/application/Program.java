@@ -1,11 +1,11 @@
 package application;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import db.DB;
-import db.DbIntegrityConstraintViolationException;
+import db.DbException;
 
 public class Program {
 
@@ -15,7 +15,7 @@ public class Program {
 		Connection conn = null;
 	//	Statement st = null;
     //  ResultSet rs = null;
-		PreparedStatement ps = null;
+		Statement ps = null;
 		
 		/*try {
 			
@@ -87,6 +87,7 @@ public class Program {
 		try {
 			
 			conn = DB.getConnection();
+			conn.setAutoCommit(false);
 			/*ps = conn.prepareStatement("UPDATE seller "
 				+ "SET BaseSalary = BaseSalary + ? "
 				+ "WHERE "
@@ -95,18 +96,39 @@ public class Program {
 			ps.setDouble(1, 500.00);
 			ps.setInt(2, 4); */
 			
-			ps = conn.prepareStatement("DELETE FROM department "
+			/*ps = conn.prepareStatement("DELETE FROM department "
 					+ "WHERE "
 					+ "Id = ?");
 			
 			ps.setInt(1, 4);
 			
 			int linhasAfetadas = ps.executeUpdate();
-			System.out.println("Done! rows affected: " + linhasAfetadas);
+			System.out.println("Done! rows affected: " + linhasAfetadas);*/
+			ps = conn.createStatement();
+			int rows1 = ps.executeUpdate("UPDATE seller SET BaseSalary = 2090 WHERE DepartmentId = 1");
+			
+			int x = 1;
+			if (x < 2) {
+				throw new SQLException("Fake error");
+			}
+			
+			int rows2 = ps.executeUpdate("UPDATE seller SET BaseSalary = 3090 WHERE DepartmentId = 2");
+			
+			conn.commit();
+			
+			System.out.println("rows1 = " + rows1);
+			System.out.println("rows2 = " + rows2);
 			
 			
 		}catch(SQLException e) {
-			throw new DbIntegrityConstraintViolationException(e.getMessage());
+			try {
+				conn.rollback();
+				throw new DbException("Transaction rolled back! Caused by: " + e.getMessage());
+				
+			} catch (SQLException e1) {
+				throw new DbException("Error trying to rollback! Caused by: " + e1.getMessage());
+				
+			}
 		}
 		
 		finally {
